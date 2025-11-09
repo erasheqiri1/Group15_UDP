@@ -26,4 +26,48 @@ if (!full.startsWith(BASE_DIR)) {
 throw new Error('Invalid path');
 }
 return full;
+} 
+function hasAdmin() { 
+for (const c of clients.values()) { 
+if (c.role === 'admin') return true; 
+} 
+return false; 
+} 
+ 
+function registerClient(address, port, maybeRole) { 
+  const key = `${address}:${port}`; 
+  let client = clients.get(key); 
+ 
+  if (!client) { 
+    if (clients.size >= MAX_CLIENTS) { 
+      return null; 
+    } 
+    client = { 
+      address, 
+      port, 
+      role: 'read', 
+      lastSeen: Date.now(), 
+      msgCount: 0, 
+      bytesIn: 0, 
+      bytesOut: 0, 
+    }; 
+    if (maybeRole === 'admin' && !hasAdmin()) { 
+      client.role = 'admin'; 
+    } 
+    clients.set(key, client); 
+  } else { 
+    if (maybeRole === 'admin' && client.role !== 'admin' && !hasAdmin()) { 
+      client.role = 'admin'; 
+    } 
+    client.lastSeen = Date.now(); 
+  } 
+ 
+  return client; 
+} 
+ 
+function sendToClient(client, message) { 
+  const buf = Buffer.from(message); 
+  server.send(buf, client.port, client.address); 
+  client.bytesOut += buf.length; 
+  totalBytesOut += buf.length; 
 }
