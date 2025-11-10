@@ -108,3 +108,11 @@ setInterval(() => {
     }
   }
 }, 5_000);
+
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', (data) => {
+  const cmd = data.toString().trim().toUpperCase();
+  if (cmd === 'STATS') {
+    logStats();
+  }
+});
