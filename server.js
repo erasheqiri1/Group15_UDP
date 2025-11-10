@@ -99,3 +99,12 @@ function logStats() {
   console.log(output);
   fs.appendFileSync(STATS_FILE, output + '\n');
 }
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, c] of clients.entries()) {
+    if (now - c.lastSeen > TIMEOUT_MS) {
+      console.log(`Client ${key} timed out. Removing from active list.`);
+      clients.delete(key);
+    }
+  }
+}, 5_000);
