@@ -71,3 +71,31 @@ function sendToClient(client, message) {
   client.bytesOut += buf.length; 
   totalBytesOut += buf.length; 
 }
+
+function logStats() {
+  let activeCount = 0;
+  const now = Date.now();
+  let lines = [];
+
+  for (const c of clients.values()) {
+    const isActive = now - c.lastSeen <= TIMEOUT_MS;
+    if (isActive) activeCount++;
+  }
+
+  lines.push('=== SERVER STATS ===');
+  lines.push(`Active connections: ${activeCount}`);
+  lines.push(`Total messages: ${totalMessages}`);
+  lines.push(`Total bytes in : ${totalBytesIn}`);
+  lines.push(`Total bytes out: ${totalBytesOut}`);
+
+  for (const [key, c] of clients.entries()) {
+    const isActive = now - c.lastSeen <= TIMEOUT_MS;
+    lines.push(
+      `Client ${key} [role=${c.role}, active=${isActive}] - msgs=${c.msgCount}, bytesIn=${c.bytesIn}, bytesOut=${c.bytesOut}`
+    );
+  }
+
+  const output = lines.join('\n') + '\n';
+  console.log(output);
+  fs.appendFileSync(STATS_FILE, output + '\n');
+}
