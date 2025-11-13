@@ -163,3 +163,34 @@ server.on('message', (msg, rinfo) => {
     totalBytesOut += buf.length; 
     return; 
   } 
+
+           
+  client.lastSeen = Date.now(); 
+  client.msgCount++; 
+  client.bytesIn += msg.length; 
+ 
+  if (!message.startsWith('/')) { 
+    console.log(`Msg from ${key}: ${message}`); 
+    const respond = () => sendToClient(client, `ECHO: ${message}`); 
+    if (client.role === 'admin') { 
+      respond(); 
+    } else { 
+      setTimeout(respond, 500); 
+    } 
+    return; 
+  } 
+ 
+  handleCommand(client, message); 
+}); 
+ 
+server.on('listening', () => { 
+  const addr = server.address(); 
+  console.log(`UDP server listening on ${addr.address}:${addr.port}`); 
+}); 
+ 
+server.on('error', (err) => { 
+  console.error('Server error:', err); 
+  server.close(); 
+}); 
+ 
+server.bind(PORT, HOST); 
