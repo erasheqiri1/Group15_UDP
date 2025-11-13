@@ -6,3 +6,20 @@ const SERVER_HOST = process.argv[3] || '127.0.0.1';
 const SERVER_PORT = parseInt(process.argv[4], 10) || 4000;
 const ROLE = roleArg === 'admin' ? 'admin' : 'read';
 const client = dgram.createSocket('udp4');
+
+function sendHello() {
+const message = Buffer.from(`HELLO ${ROLE}`);
+client.send(message, SERVER_PORT, SERVER_HOST);
+}
+function sendLine(line) {
+const trimmed = line.trim();
+if (!trimmed) return;
+if (trimmed.toLowerCase() === 'exit') {
+console.log('Closing client...');
+client.close();
+rl.close();
+process.exit(0);
+}
+const buf = Buffer.from(trimmed);
+client.send(buf, SERVER_PORT, SERVER_HOST);
+}
