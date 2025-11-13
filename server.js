@@ -291,6 +291,48 @@ reply(`OK Deleted ${argLine}`);
 break;
 }
 
+ case 'search': {
+if (!isAdmin) {
+reply('ERROR Permission denied: /search admin only.');
+return;
+}
+if (!argLine) {
+reply('ERROR Usage: /search <keyword>');
+return;
+}
+if (!fs.existsSync(BASE_DIR)) {
+fs.mkdirSync(BASE_DIR, { recursive: true });
+}
+const keyword = argLine.toLowerCase();
+const files = fs.readdirSync(BASE_DIR);
+const matches = files.filter((f) => f.toLowerCase().includes(keyword));
+reply('SEARCH RESULTS:\n' + (matches.length ? matches.join('\n') : '(no matches)'));
+break;
+}
+case 'info': {
+if (!isAdmin) {
+reply('ERROR Permission denied: /info admin only.');
+return;
+}
+if (!argLine) {
+reply('ERROR Usage: /info <filename>');
+return;
+}
+const filePath = safePath(argLine);
+if (!fs.existsSync(filePath)) {
+reply('ERROR File not found');
+return;
+}
+const stats = fs.statSync(filePath);
+reply(
+`INFO ${argLine}:\n` +
+`Size: ${stats.size} bytes\n` +
+`Created: ${stats.birthtime}\n` +
+
+`Modified: ${stats.mtime}`
+);
+break;
+}
  
   default:
 reply('ERROR Unknown command');
