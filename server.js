@@ -194,3 +194,28 @@ server.on('error', (err) => {
 }); 
  
 server.bind(PORT, HOST); 
+
+async function handleCommand(client, raw) {
+const line = raw.slice(1).trim();
+
+const [cmd, ...rest] = line.split(' ');
+const argLine = rest.join(' ').trim();
+const isAdmin = client.role === 'admin';
+const reply = (text) => {
+const respond = () => sendToClient(client, text);
+if (isAdmin) respond();
+else setTimeout(respond, 500);
+};
+try {
+switch (cmd.toLowerCase()) {
+
+
+
+  default:
+reply('ERROR Unknown command');
+}
+} catch (err) {
+console.error('Command error:', err);
+reply('ERROR ' + err.message);
+}
+}
