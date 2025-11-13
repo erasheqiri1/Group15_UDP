@@ -143,3 +143,23 @@ server.on('message', (msg, rinfo) => {
       totalBytesOut += buf.length; 
       return; 
     } 
+
+    client.msgCount++; 
+    client.bytesIn += msg.length; 
+ 
+    sendToClient( 
+      client, 
+      `WELCOME role=${client.role}. Use commands like /list, /read <file>, /upload, /download, ...` 
+    ); 
+    return; 
+  } 
+ 
+  const key = `${rinfo.address}:${rinfo.port}`; 
+  const client = clients.get(key); 
+ 
+  if (!client) { 
+    const buf = Buffer.from('ERROR Please send "HELLO admin" or "HELLO read" first.'); 
+    server.send(buf, rinfo.port, rinfo.address); 
+    totalBytesOut += buf.length; 
+    return; 
+  } 
