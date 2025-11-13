@@ -221,36 +221,35 @@ const files = fs.readdirSync(BASE_DIR);
 reply('FILES:\n' + (files.length ? files.join('\n') : '(empty)'));
 break;
 }
-case 'read': {
-if (!argLine) {
-reply('ERROR Usage: /read <filename>');
-return;
-}
- case 'download': {
-if (!argLine) {
-reply('ERROR Usage: /download <filename>');
-return;
-}
-const filePath = safePath(argLine);
-if (!fs.existsSync(filePath)) {
-reply('ERROR File not found');
-return;
+  case 'read': {
+    if (!argLine) {
+      reply('ERROR Usage: /read <filename>');
+      return;
+    }
+    const filePath = safePath(argLine);
+        if (!fs.existsSync(filePath)) {
+          reply('ERROR File not found');
+          return;
+        }
+        const content = fs.readFileSync(filePath, 'utf8');
+        reply(`CONTENT ${argLine}:\n${content}`);
+        break;
+      }
+  case 'download': {
+    if (!argLine) {
+      reply('ERROR Usage: /download <filename>');
+      return;
+    }
+    const filePath = safePath(argLine);
+    if (!fs.existsSync(filePath)) {
+      reply('ERROR File not found');
+      return;
 
-}
-const content = fs.readFileSync(filePath, 'utf8');
-reply(`FILE ${argLine}|${content}`);
-break;
-}
-const filePath = safePath(argLine);
-if (!fs.existsSync(filePath)) {
-reply('ERROR File not found');
-return;
-}
-const content = fs.readFileSync(filePath, 'utf8');
-reply(`CONTENT ${argLine}:\n${content}`);
-break;
-}
-
+    }
+    const content = fs.readFileSync(filePath, 'utf8');
+    reply(`FILE ${argLine}|${content}`);
+    break;
+  }
 
 case 'upload': {
 if (!isAdmin) {
