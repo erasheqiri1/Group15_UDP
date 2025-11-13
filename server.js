@@ -251,6 +251,47 @@ reply(`CONTENT ${argLine}:\n${content}`);
 break;
 }
 
+
+case 'upload': {
+if (!isAdmin) {
+reply('ERROR Permission denied: /upload admin only.');
+return;
+}
+const [filename, content] = argLine.split('|');
+if (!filename || content === undefined) {
+reply('ERROR Usage: /upload <filename>|<content>');
+return;
+}
+if (!fs.existsSync(BASE_DIR)) {
+fs.mkdirSync(BASE_DIR, { recursive: true });
+}
+const filePath = safePath(filename.trim());
+fs.writeFileSync(filePath, content, 'utf8');
+reply(`OK Uploaded ${filename.trim()}`);
+break;
+}
+
+ case 'delete': {
+if (!isAdmin) {
+reply('ERROR Permission denied: /delete admin only.');
+
+return;
+}
+if (!argLine) {
+reply('ERROR Usage: /delete <filename>');
+return;
+}
+const filePath = safePath(argLine);
+if (!fs.existsSync(filePath)) {
+reply('ERROR File not found');
+return;
+}
+fs.unlinkSync(filePath);
+reply(`OK Deleted ${argLine}`);
+break;
+}
+
+ 
   default:
 reply('ERROR Unknown command');
 }
