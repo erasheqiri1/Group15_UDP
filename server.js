@@ -115,4 +115,31 @@ process.stdin.on('data', (data) => {
   if (cmd === 'STATS') {
     logStats();
   }
+ 
 });
+
+async function handleCommand(client, raw) {} 
+ 
+server.on('message', (msg, rinfo) => { 
+  const message = msg.toString().trim(); 
+ 
+ 
+  fs.appendFileSync( 
+    MSG_LOG, 
+    `[${new Date().toISOString()}] ${rinfo.address}:${rinfo.port} -> ${message}\n` 
+  ); 
+ 
+  totalBytesIn += msg.length; 
+  totalMessages++; 
+ 
+  if (message.startsWith('HELLO')) { 
+    const parts = message.split(/\s+/); 
+    const role = parts[1] === 'admin' ? 'admin' : 'read'; 
+ 
+    const client = registerClient(rinfo.address, rinfo.port, role); 
+    if (!client) { 
+      const buf = Buffer.from('ERROR SERVER_BUSY'); 
+      server.send(buf, rinfo.port, rinfo.address); 
+      totalBytesOut += buf.length; 
+      return; 
+    } 
