@@ -23,3 +23,15 @@ process.exit(0);
 const buf = Buffer.from(trimmed);
 client.send(buf, SERVER_PORT, SERVER_HOST);
 }
+client.on('message', (msg, rinfo) => {
+    console.log(`\n[SERVER]: ${msg.toString()}`);
+    rl.prompt();
+});
+setInterval(() => {
+    const buf = Buffer.from('PING');
+    client.send(buf, SERVER_PORT, SERVER_HOST);
+}, 500_000);
+client.on('error', (err) => {
+    console.error('Client error:', err);
+    client.close();
+});
