@@ -46,3 +46,11 @@ rl.prompt();
 rl.on('line', (line) => {
 sendLine(line);
 });
+
+client.on('listening', () => {
+console.log(`Client started as ROLE=${ROLE}, connecting to
+${SERVER_HOST}:${SERVER_PORT}`);
+sendHello();
+});
+
+client.bind();
