@@ -35,3 +35,14 @@ client.on('error', (err) => {
     console.error('Client error:', err);
     client.close();
 });
+const rl = readline.createInterface({
+input: process.stdin,
+output: process.stdout,
+});
+console.log('Type commands or text. Use "exit" to quit.');
+console.log(`Role: ${ROLE}, Server: ${SERVER_HOST}:${SERVER_PORT}`);
+rl.setPrompt('> ');
+rl.prompt();
+rl.on('line', (line) => {
+sendLine(line);
+});
