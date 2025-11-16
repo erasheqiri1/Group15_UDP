@@ -1,12 +1,17 @@
-
 const dgram = require('dgram');
 const readline = require('readline');
-const fs = require('fs'); 
+const fs = require('fs');
 
-const roleArg = process.argv[2] || 'read';
+const roleArg = process.argv[2];
 const SERVER_HOST = process.argv[3] || '192.168.10.130';
 const SERVER_PORT = parseInt(process.argv[4], 10) || 4000;
-const ROLE = roleArg === 'admin' ? 'admin' : 'read';
+
+if (roleArg !== 'admin' && roleArg !== 'read') {
+  console.error('Usage: node client.js <admin|read> [host] [port]');
+  process.exit(1);
+}
+
+const ROLE = roleArg; 
 const client = dgram.createSocket('udp4');
 
 function sendHello() {
@@ -29,13 +34,12 @@ function sendLine(line) {
   client.send(buf, SERVER_PORT, SERVER_HOST);
 }
 
-client.on('message', (msg, rinfo) => {
+client.on('message', (msg) => {
   const text = msg.toString();
 
   if (text.startsWith('FILE ')) {
-
     const [header, ...rest] = text.split('|');
-    const content = rest.join('|');     
+    const content = rest.join('|');
     const parts = header.split(' ');
     const filename = parts[1] || 'download.txt';
 
@@ -50,18 +54,6 @@ client.on('message', (msg, rinfo) => {
   }
 
   rl.prompt();
-});
-
-
-const pingInterval = setInterval(() => {
-  const buf = Buffer.from('PING');
-  client.send(buf, SERVER_PORT, SERVER_HOST);
-}, 500_000); 
-
-client.on('error', (err) => {
-  console.error('Client error:', err);
-  clearInterval(pingInterval);
-  client.close();
 });
 
 const rl = readline.createInterface({
@@ -86,5 +78,3 @@ client.on('listening', () => {
 });
 
 client.bind();
-
-
