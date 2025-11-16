@@ -265,8 +265,7 @@ async function handleCommand(client, raw) {
   try {
     switch (cmd.toLowerCase()) {
       case 'list': {
-        if (!isAdmin) return reply('ERROR Permission denied: /list is
-admin only.');
+        if (!isAdmin) return reply('ERROR Permission denied: /list is admin only.');
         const files = fs.readdirSync(BASE_DIR);
         reply('FILES:\n' + (files.length ? files.join('\n') : '(empty)'));
         break;
