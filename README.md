@@ -99,7 +99,7 @@ node client.js read
 <img width="721" height="321" alt="Screenshot 2025-11-16 175552" src="https://github.com/user-attachments/assets/fffde3c3-d06b-46db-878d-5bec0da647a0" />
 
 
-### Për klientët me leje të kufizuar zbatohet një vonesë prej 1 minute para se të kthehet përgjigjja nga serveri.
+### Për klientët me leje të kufizuar zbatohet një vonesë prej 30 sekondave para se të kthehet përgjigjja nga serveri.
 <img width="642" height="191" alt="ok" src="https://github.com/user-attachments/assets/17a2b750-ee7c-44b9-9072-cb5848741e82" />
 
 ---
