@@ -1,3 +1,4 @@
+
 const dgram = require('dgram');
 const fs = require('fs');
 const path = require('path');
@@ -5,13 +6,14 @@ const path = require('path');
 const PORT = 4000;
 const HOST = '0.0.0.0';
 const MAX_CLIENTS = 4;
-const TIMEOUT_MS = 300_000; 
+const TIMEOUT_MS = 300_000;
 const BASE_DIR = path.join(__dirname, 'server_files');
 const STATS_FILE = path.join(BASE_DIR, 'server_stats.txt');
 const MSG_LOG = path.join(BASE_DIR, 'messages.log');
 
 const READ_DELAY = 60_000; 
-const ADMIN_DELAY = 0;      
+const ADMIN_DELAY = 0;    
+
 if (!fs.existsSync(BASE_DIR)) {
     fs.mkdirSync(BASE_DIR, { recursive: true });
 }
@@ -22,6 +24,7 @@ const clients = new Map();
 let totalBytesIn = 0;
 let totalBytesOut = 0;
 let totalMessages = 0;
+
 
 function safePath(filename) {
     const full = path.join(BASE_DIR, filename);
@@ -64,15 +67,21 @@ function registerClient(address, port, maybeRole) {
         }
         client.lastSeen = Date.now();
     }
-
     return client;
 }
 
 function sendToClient(client, message) {
     const buf = Buffer.from(message);
+
     server.send(buf, client.port, client.address);
+
     client.bytesOut += buf.length;
     totalBytesOut += buf.length;
+
+    fs.appendFileSync(
+        MSG_LOG,
+        `[${new Date().toISOString()}] SERVER -> ${client.address}:${client.port} : ${message}\n`
+    );
 }
 
 function logStats() {
@@ -115,9 +124,10 @@ setInterval(() => {
 
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (data) => {
-    const cmd = data.toString().trim().toUpperCase();
-    if (cmd === 'STATS') logStats();
+    if (data.toString().trim().toUpperCase() === 'STATS') logStats();
 });
+
+
 
 server.on('message', (msg, rinfo) => {
     const message = msg.toString().trim();
@@ -159,7 +169,6 @@ server.on('message', (msg, rinfo) => {
     client.msgCount++;
     client.bytesIn += msg.length;
 
-    // Mesazhet e zakonshme
     if (!message.startsWith('/')) {
         const respond = () => sendToClient(client, `ECHO: ${message}`);
         const delay = client.role === 'admin' ? ADMIN_DELAY : READ_DELAY;
@@ -184,6 +193,7 @@ server.on('error', (err) => {
 });
 
 server.bind(PORT, HOST);
+
 
 
 async function handleCommand(client, raw) {
